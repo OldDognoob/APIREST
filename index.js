@@ -1,6 +1,10 @@
+const Joi = require('joi');
 //load express module
 const express = require('express');
+const { join } = require('node:path');
 const app = express();
+
+app.use(express.json());
 
 const courses = [
     {id:1, name:'course1'},
@@ -20,6 +24,28 @@ app.get('/api/courses',(req,res)=>{
   //return an array of numbers
   res.send(courses);
 })
+
+//POST method
+app.post('/api/courses', (req,res)=>{
+    const schema = {
+        name: join.toString().min(3).requires()
+    };
+
+    const result = Join.validate(req.body.schema)
+    
+
+    if(result.error) {
+        // 400 bad request
+        res.status(400).send(result.error);
+        return;
+    }
+    const course = {
+        id: courses.length + 1,
+        name: req.body.name
+    };
+    courses.push(course);
+    res.send(course);
+});
 
 // /api/courses/1
 app.get('/api/courses/:id', (req, res)=>{
