@@ -36,7 +36,7 @@ app.post('/api/courses', (req,res)=>{
 
     if(result.error) {
         // 400 bad request
-        res.status(400).send(result.error);
+        res.status(400).send(result.error.details[0].message);
         return;
     }
     const course = {
@@ -46,6 +46,31 @@ app.post('/api/courses', (req,res)=>{
     courses.push(course);
     res.send(course);
 });
+
+//PUT Method
+app.put('/api/course/:id', (req,res)=>{
+    const course = courses.find(c=>c.id===parseInt(req.params.id));
+    if(!course)res.status(404).send('The course with the given ID was not found');
+
+    const result = validateCourse(req.body);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+
+    // Update Course
+    course.name = req.body.name;
+
+    //Return the update course
+    res.send(course);
+})
+
+function validateCourse(course){
+    const schema={
+        name: Join.string().min(3).required()
+    };
+    return Join.validate(course, schema)
+}
 
 // /api/courses/1
 app.get('/api/courses/:id', (req, res)=>{
